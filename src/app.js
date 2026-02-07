@@ -159,3 +159,10 @@ app.get('/', (req, res) => {
 // Exportar app
 // ===============================
 module.exports = app;
+// ===============================
+// Middleware global de manejo de errores
+// ===============================
+app.use((err, req, res, next) => {
+  console.error('Error global:', err);
+  res.status(500).json({ message: 'Error interno del servidor', error: err.message, stack: err.stack });
+});
