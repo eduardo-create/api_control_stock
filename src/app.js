@@ -13,6 +13,26 @@ const allowedOrigins = FRONTEND_ORIGINS.split(',').map(o => o.trim()).filter(Boo
 const devRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 const lanRegex = /^https?:\/\/(192\.168\.[0-9]{1,3}\.[0-9]{1,3}|10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]{1,3}\.[0-9]{1,3})(:\d+)?$/;
 
+// Middleware para manejar preflight (OPTIONS) y CORS de forma explícita
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (
+    !origin ||
+    allowedOrigins.includes(origin) ||
+    devRegex.test(origin) ||
+    lanRegex.test(origin)
+  ) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+  }
+  next();
+});
+
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
