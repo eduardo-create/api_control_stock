@@ -1,5 +1,7 @@
 const swaggerJSDoc = require('swagger-jsdoc');
 
+const swaggerServerUrl = process.env.SWAGGER_SERVER_URL || 'http://localhost:3000';
+
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -8,7 +10,10 @@ const options = {
       version: '1.0.0',
       description: 'API REST para un sistema POS: ventas, pagos, stock, turnos y caja.\n\nRoles configurables por negocio: admin (total), cajero (ventas/caja), vendedor (ventas), encargado (reportes/local), consulta (solo lectura). El rol superadmin es exclusivo del sistema SaaS.'
     },
-    servers: [{ url: 'http://localhost:3000', description: 'Local server' }],
+    servers: [
+      { url: swaggerServerUrl, description: 'Dynamic server' },
+      { url: 'http://localhost:3000', description: 'Local server' }
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
