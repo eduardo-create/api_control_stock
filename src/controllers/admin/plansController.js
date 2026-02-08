@@ -11,6 +11,7 @@ exports.create = async (req, res) => {
     );
     res.status(201).json({ message: 'Plan creado', plan: result.rows[0] });
   } catch (err) {
+    console.error('Error en create plan:', err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -18,9 +19,17 @@ exports.create = async (req, res) => {
 // Listar planes
 exports.list = async (req, res) => {
   try {
-    const result = await db.query(`SELECT * FROM plans ORDER BY created_at DESC`);
+    // Verificar si la columna created_at existe
+    const colCheck = await db.query(`SELECT column_name FROM information_schema.columns WHERE table_name = 'plans' AND column_name = 'created_at'`);
+    let result;
+    if (colCheck.rows.length > 0) {
+      result = await db.query(`SELECT * FROM plans ORDER BY created_at DESC`);
+    } else {
+      result = await db.query(`SELECT * FROM plans ORDER BY id DESC`);
+    }
     res.json(result.rows);
   } catch (err) {
+    console.error('Error en listar planes:', err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -33,6 +42,7 @@ exports.getById = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Plan no encontrado' });
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Error en getById plan:', err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -49,6 +59,7 @@ exports.update = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Plan no encontrado' });
     res.json({ message: 'Plan actualizado', plan: result.rows[0] });
   } catch (err) {
+    console.error('Error en update plan:', err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -61,6 +72,7 @@ exports.remove = async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Plan no encontrado' });
     res.json({ message: 'Plan eliminado', plan: result.rows[0] });
   } catch (err) {
+    console.error('Error en remove plan:', err);
     res.status(500).json({ error: err.message });
   }
 };

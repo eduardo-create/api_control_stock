@@ -95,6 +95,7 @@ exports.crearNegocio = async (req, res) => {
       negocio: result.rows[0]
     });
   } catch (err) {
+    console.error('Error en crearNegocio:', err);
     res.status(500).json({ error: err.message });
   }
 };
